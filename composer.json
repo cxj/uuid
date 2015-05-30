@@ -1,0 +1,21 @@
+{
+    "name": "cxj/uuid",
+    "type": "library",
+    "description": "A PHP UUID implementation",
+    "keywords": [
+        "uuid"
+    ],
+    "homepage": "https://github.com/cxj/uuid",
+    "license": "BSD-2-Clause",
+    "authors": [
+        {
+            "name": "Chris Johnson"
+        }
+    ],
+    "autoload": {
+        "psr-4": {
+            "Cxj\\uuid\\": "src/"
+        }
+    }
+}
+        
