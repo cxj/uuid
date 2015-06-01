@@ -35,7 +35,7 @@ namespace Cxj;
 class Uuid
 {
     /*
-     * In C/C++ terms, the 128 bits of the UUID are defined thusly:
+     * In C/C++ terms, the 128 bits of the UUID are defined:
      *
      * typedef struct {
      *     unsigned32  time_low;
@@ -59,24 +59,25 @@ class Uuid
      */
     public static function v4()
     {
+
         return sprintf('%04x%04x-%04x-%04x-%04x-%04x%04x%04x',
 
-            // 32 bits for "time_low"
+            // 2 x 16 bit randoms for time_low to stay 32-bit system safe.
             mt_rand(0, 0xffff), mt_rand(0, 0xffff),
 
-            // 16 bits for "time_mid"
+            // 1 x 16 bit random for time_mid.
             mt_rand(0, 0xffff),
 
-            // 16 bits for "time_hi_and_version",
-            // four most significant bits holds version number 4
+            // 16 bits total for time_hi_and_version, with
+            // 12 bits random and 4 most significant bits with version number 4.
             mt_rand(0, 0x0fff) | 0x4000,
 
-            // 16 bits, 8 bits for "clk_seq_hi_res",
-            // 8 bits for "clk_seq_low",
-            // two most significant bits holds zero and one for variant.
+            // 8 bits for clock_seq_hi_and_reserved with
+            // two most significant set to zero and one for variant,
+            // and 8 bits for clock_seq_low all in one 16 bit output string.
             mt_rand(0, 0x3fff) | 0x8000,
 
-            // 48 bits for "node"
+            // 3 x 16 bit randoms for 6 bytes of node.
             mt_rand(0, 0xffff), mt_rand(0, 0xffff), mt_rand(0, 0xffff)
         );
     }
@@ -108,27 +109,30 @@ class Uuid
             $nstr .= chr(hexdec($nhex[$i] . $nhex[$i + 1]));
         }
 
-        // Calculate hash value.
+        // Calculate SHA1 hash value.
         $hash = sha1($nstr . $name);
 
         return sprintf('%08s-%04s-%04x-%04x-%12s',
 
-            // 32 bits for "time_low"
+            // First 8 hex digits (4 bytes, 32 bits) of hash for time_low.
             substr($hash, 0, 8),
 
-            // 16 bits for "time_mid"
+            // Next 4 hex digits (2 bytes, 16 bits) of hash for time_mid.
             substr($hash, 8, 4),
 
-            // 16 bits for "time_hi_and_version",
-            // four most significant bits holds version number 5
+            // 4 hex digits of hash starting at position 12:
+            // 16 bits total for time_hi_and_version, with
+            // 12 bits hash and 4 most significant bits with version number 5.
             (hexdec(substr($hash, 12, 4)) & 0x0fff) | 0x5000,
 
-            // 16 bits, 8 bits for "clk_seq_hi_res",
-            // 8 bits for "clk_seq_low",
-            // two most significant bits holds zero and one for variant.
+            // Next 4 hex digits of hash (2 bytes):
+            // 8 bits for clock_seq_hi_and_reserved with
+            // two most significant set to zero and one for variant,
+            // and 8 bits for clock_seq_low all in one 16 bit output string.
+            // Only 14 bits of 16 from hash are used, other 2 masked off.
             (hexdec(substr($hash, 16, 4)) & 0x3fff) | 0x8000,
 
-            // 48 bits for "node"
+            // Next 12 hex digits (6 bytes) of hash for node.
             substr($hash, 20, 12)
         );
     }
@@ -143,21 +147,8 @@ class Uuid
      */
     public static function is_valid($uuid)
     {
-        return preg_match('/^\{?[0-9a-f]{8}\-?[0-9a-f]{4}\-?[0-9a-f]{4}\-?' .
-            '[0-9a-f]{4}\-?[0-9a-f]{12}\}?$/i', $uuid) === 1;
+        return preg_match(
+            '/^\{?[0-9a-f]{8}\-?[0-9a-f]{4}\-?[0-9a-f]{4}\-?[0-9a-f]{4}\-?[0-9a-f]{12}\}?$/i',
+            $uuid) === 1;
     }
 }
-
-
-
-
-
-$v4uuid = UUID::v4();
-$v5uuid = UUID::v5($v4uuid, 'SomeRandomString');
-$v5uuid2 = UUID::v5('1546058f-5a25-4334-85ae-e68f2a44bbaf', 'SomeRandomString');
-
-
-echo "v4: $v4uuid" .PHP_EOL;
-echo "v5: $v5uuid" .PHP_EOL;
-echo "v5: $v5uuid2" .PHP_EOL;
-
