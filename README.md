@@ -8,7 +8,7 @@ common outside of Microsoft environments.
 The UUIDs generated are RFC 4122 compliant.
 
 
-## Foreword
+## Introduction
 
 ### Installation
 
@@ -31,6 +31,23 @@ you notice compliance oversights, please send a patch via pull request.
 [PSR-1]: https://github.com/php-fig/fig-standards/blob/master/accepted/PSR-1-basic-coding-standard.md
 [PSR-2]: https://github.com/php-fig/fig-standards/blob/master/accepted/PSR-2-coding-style-guide.md
 [PSR-4]: https://github.com/php-fig/fig-standards/blob/master/accepted/PSR-4-autoloader.md
+
+
+### Design Goals
+
+This class was designed to cover only the most common use cases and to be 
+small and lightweight.  Hence, there are some features it does not provide.
+
+In particular:
+
+* It does not provide a version 1 (MAC address) implementation, because there is no reliable and lightweight method to obtain the MAC address from PHP.  There are also criticisms of version 1 which make it less desirable.
+
+* Version 2 (DEC Security) is also not presently implemented.  The need for this version appears small.
+
+* It does not provide a version 3 (MD5) implementation.  MD5 has been shown to have weaknesses, and version 5 (SHA-1) is recommended for usage instead.
+
+* It is a UUID generator, so very little UUID parsing and validation is part of the code at present.
+
 
 
 ## Usage
