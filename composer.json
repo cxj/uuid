@@ -12,9 +12,16 @@
             "name": "Chris Johnson"
         }
     ],
+
     "autoload": {
         "psr-4": {
             "Cxj\\uuid\\": "src/"
+        }
+    },
+
+    "extra": {
+        "branch-alias": {
+            "dev-master": "1.0.x-dev"
         }
     }
 }
